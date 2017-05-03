@@ -13,4 +13,27 @@
 
 ###  延迟脚本
 html4定义一个扩展属性：defer。以及H5引进的async属性，用于异步加载脚本。  
-async与defer的相同点是采用并行下载，在下载过程中不会产生阻塞。区别在于执行时机，async是加载完成后**自动执行**，而defer需要**等待页面完成后执行**
+async与defer的相同点是采用并行下载，在下载过程中不会产生阻塞。区别在于执行时机，async是加载完成后**自动执行**，而defer需要**等待页面完成后执行**  
+下面看个列子展示了defer属性如何影响脚本行为：
+> H5规范定义：defer属性仅当src属性声明时才生效。
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+  <script defer>
+    alert("defer")
+  </script>
+  <script>alert("script")</script>
+  <script>
+    window.onload = function(){
+      alert('load')
+    }
+  </script>
+</body>
+</html>
+```
+在支持defer属性的浏览器傻姑娘，弹出的顺序是：script，defer，load。
