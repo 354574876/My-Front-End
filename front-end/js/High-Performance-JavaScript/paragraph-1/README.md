@@ -37,3 +37,48 @@ async与defer的相同点是采用并行下载，在下载过程中不会产生�
 </html>
 ```
 在支持defer属性的浏览器傻姑娘，弹出的顺序是：script，defer，load。
+
+## 动态脚本元素
+这种技术的重点在于：无论何时启动下载，文件的下载和执行过成不会阻塞页面其它进程。  
+如果页面其它脚本依赖该脚本时候，就会有问题。这种情况下，你必须跟踪并确保脚本下载完成且准备就绪。  
+
+```javascript
+var scrpt = document.createElement("script");
+	script.type = 'text/javascript';
+	//IE
+	if( script.readyState){
+		script.onreadystatechange = function(){
+			if(script.readyState == 'loaded' || script.readyState == 'complete'){
+				script.onreadstatechange = null;
+				callback()
+			}
+		}
+	}else{//firefox,Opera,chrome,safari
+		script.onload = function(){
+			callback()
+		}
+	}
+	
+	script.src = 'file.js';
+	document.head.appendChild(script);
+```
+动态脚本加载凭借着它在跨浏览器兼容性和易用的优势，成为最通用的无阻塞加载解决方案。
+
+## XMLHttpRequest 脚本注入
+
+例：该方法的主要优点是，你可以下载JavaScript代码但不立即执行
+```javascript
+var xhr = new XMLHttpRequest();
+	xhr.open('get','file.js',true)
+	xhr.onreadystatechange = function(){
+		if(xhr.readyState == 4){
+			if(xhr.status >= 200 && xhr.status < 300 || xhr.status == 304){
+				var script = document.createElement("script");
+				script.type = 'text/javascript';
+				script.text = xhr.responseText;
+				document.body.appendChild(script);
+			}
+		}
+	}
+	xhr.send(null);
+```
